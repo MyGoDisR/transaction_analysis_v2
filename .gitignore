@@ -1,2 +1,6 @@
 /Data/*
 /output.csv
+/restricted.py
+/.streamlit
+/utils/__pycache__
+/__pycache__

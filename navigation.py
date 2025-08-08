@@ -56,8 +56,6 @@ def authenticated_menu():
         st.write(f'  {translations["today"][st.session_state.lang]} {datetime.today().strftime("%Y-%m-%d")}')
         st.write(f'  {translations["refresh"][st.session_state.lang]} TBD')
         st.divider()
-        #lang = ["POL", "ENG"]
-        #lang_selection = st.pills(translations["language"][st.session_state.lang], lang, selection_mode="single", key='_lang', on_click )
         def set_lang(lang_code):
             st.session_state.lang = lang_code
         st.button("English", on_click=set_lang, args=("ENG",))
@@ -71,13 +69,11 @@ def authenticated_menu():
         return st.session_state.lang
 
 def unauthenticated_menu():
-    # Show a navigation menu for unauthenticated users
     st.sidebar.title('Use below link to log in or register:')
     st.sidebar.page_link("app.py", label="Log in / Sign in")
 
 
 def menu():
-    # Determine if a user is logged in or not, then show the correct navigation menu
     if "role_" not in st.session_state or st.session_state.role_ is None:
         unauthenticated_menu()
         return

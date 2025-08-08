@@ -1,19 +1,14 @@
 import streamlit as st
-import yfinance as yf
 import utils.trading as trading
-import os
 import navigation
 import pandas as pd
 import numpy as np
 import sqlite3
-import time
+from  db import queries as qs
 
 from forex_python.bitcoin import BtcConverter
 
-import certifi
 import yfinance as yf
-import ssl
-import urllib.request
 import pandas_datareader as pdr
 import restricted as res_ 
 
@@ -29,7 +24,7 @@ navigation.menu()
 st.title("Yahoo Finance Data")
 
 # Creating conection to db
-new_con = sqlite3.connect("users_.db")
+new_con = qs.get_connection()
 new_cur = new_con.cursor()
 
 # just in case if overpopulate
@@ -54,12 +49,7 @@ new_cur.execute("""CREATE TABLE IF NOT EXISTS price_history (
                     );
                     """)
 
-# Creating conection to db
-new_con = sqlite3.connect("users_.db")
-new_cur = new_con.cursor()
 
-# Checking portolfio db
-i = 1
 
 df_portfolio = pd.read_sql_query(f"SELECT * FROM user_portfolio WHERE login = ?;", new_con, params=(st.session_state.role_,))
 
@@ -72,9 +62,7 @@ if df_portfolio.empty:
         data = pd.DataFrame({'Ticker':[],'Purchase Date':[],'Quantity':[]})
         st.session_state.data = data
 
-        # commit insert
         new_con.commit()
-        # close the connection
         new_con.close()
 
     def add_dfForm():
@@ -107,12 +95,11 @@ if df_portfolio.empty:
         st.form_submit_button(on_click=add_dfForm if sum(i) == 6 else noadd_dfForm)
 
     def save_db():
-        # Creating conection to db
         new_con = sqlite3.connect("users_.db")
         new_cur = new_con.cursor()
 
         # just in case if overpopulate
-        new_cur.execute('DROP TABLE IF EXISTS user_portfolio;')
+        # new_cur.execute('DROP TABLE IF EXISTS user_portfolio;')
 
         # create new databse if not exsist
         new_cur.execute("""CREATE TABLE IF NOT EXISTS user_portoflio (
@@ -130,7 +117,7 @@ if df_portfolio.empty:
         new_cur.execute("Insert Into users (login, purchase_date, quantity) Values(?,?,?);", portfolio_details)
 
         # just in case if overpopulate
-        new_cur.execute('DROP TABLE IF EXISTS price_history;')
+        # new_cur.execute('DROP TABLE IF EXISTS price_history;')
 
         # create new databse if not exsist
         new_cur.execute("""CREATE TABLE IF NOT EXISTS price_history (

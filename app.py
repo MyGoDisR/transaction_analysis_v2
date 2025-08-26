@@ -5,6 +5,7 @@ import navigation
 import sqlite3
 import pandas as pd
 import certifi
+from db import queries as qs
 
 # This is the structure of the app,
 # There will be a navigation bar in for historical spenditure by year/month/week and overall
@@ -20,7 +21,6 @@ import certifi
 # Initialize st.session_state.lang to None
 if "lang" not in st.session_state:
     st.session_state.lang = 'ENG'
-    lang_number = 0
 
 lang = ["ENG", "POL"]
 lang_selection = st.pills("", lang, selection_mode="single", width="stretch")
@@ -61,7 +61,8 @@ username = st.text_input(translations["logs"][st.session_state.lang], key='login
 password = st.text_input(translations["pass"][st.session_state.lang], key='password', type="password")
 
 # Creating conection to db
-new_con = sqlite3.connect("users_.db")
+new_con = qs.get_connection()
+new_con = sqlite3.connect("db/users_.db")
 new_cur = new_con.cursor()
 
 # Checking userbase 

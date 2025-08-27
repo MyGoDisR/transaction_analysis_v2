@@ -65,13 +65,12 @@ st.write('')
 
 col1, col2 = st.columns([1,2])
 with col1:
-    if st.button(translations["create"][st.session_state.lang], on_click=login_management.creat_new_user):
-        if login_management.creat_new_user == True:
+    if st.button(translations["create"][st.session_state.lang]):#, on_click=login_management.creat_new_user(user_choice)):
+        if login_management.creat_new_user(user_choice) == True:
             st.session_state.logged_in = True
             st.session_state.role_ = st.session_state['login_']
-            sleep(2)
-            st.write(login_management.creat_new_user)
-            #st.switch_page('pages/home.py')
+            sleep(1)
+            st.switch_page('app.py')
 with col2:
     if st.button(translations["abort"][st.session_state.lang]):
         st.session_state.logged_in = False

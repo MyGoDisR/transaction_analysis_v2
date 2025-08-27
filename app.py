@@ -1,11 +1,11 @@
 import streamlit as st
 from time import sleep
-import navigation
-
+import utils.navigation as navigation
+import utils.login_management as login_management
 import sqlite3
 import pandas as pd
 import certifi
-from db import queries as qs
+from utils import queries as qs
 
 # This is the structure of the app,
 # There will be a navigation bar in for historical spenditure by year/month/week and overall
@@ -54,6 +54,7 @@ if "clicked" not in st.session_state:
 def onSearch(opt):
     st.session_state["clicked"] = True
 
+qs.init_db()
 
 st.title(translations["title"][st.session_state.lang])
 
@@ -61,19 +62,20 @@ username = st.text_input(translations["logs"][st.session_state.lang], key='login
 password = st.text_input(translations["pass"][st.session_state.lang], key='password', type="password")
 
 # Creating conection to db
-new_con = qs.get_connection()
-new_con = sqlite3.connect("db/users_.db")
-new_cur = new_con.cursor()
+con = sqlite3.connect("db/users_.db")
+cursor = con.cursor()
+cursor.execute('''
+SELECT * FROM users
+''')
 
 # Checking userbase 
 select_query = "SELECT * FROM users;"
-df_users = pd.read_sql_query(select_query, new_con)
+df_users = pd.read_sql_query(select_query, con)
 
 if st.button(translations["login"][st.session_state.lang], type="primary"):
-    import utils.login_management as login_management
-    if username in df_users['login'].tolist():
-        if login_management.hash_password(password)[1] == df_users[df_users['login']==f'{username}']['password'].iloc[0]:
-            new_cur.close()
+    if username in df_users['login_'].tolist():
+        if login_management.hash_password(password)[1] == df_users[df_users['login_']==f'{username}']['password_'].iloc[0]:
+            cursor.close()
             st.session_state.logged_in = True
             st.session_state.role_ = st.session_state['login_']
             key = "_role"

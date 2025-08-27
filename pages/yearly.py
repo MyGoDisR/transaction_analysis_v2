@@ -5,7 +5,7 @@ import altair as alt
 import sys
 import os
 import utils.finance as finance
-import navigation
+import utils.navigation as navigation
 import requests
 from forex_python.converter import CurrencyRates
 from forex_python.bitcoin import BtcConverter

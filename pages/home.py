@@ -1,5 +1,5 @@
 import streamlit as st
-import navigation
+import utils.navigation as navigation
 import os
 import utils.finance as finance
 

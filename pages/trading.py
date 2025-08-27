@@ -1,10 +1,10 @@
 import streamlit as st
 import utils.trading as trading
-import navigation
+import utils.navigation as navigation
 import pandas as pd
 import numpy as np
 import sqlite3
-from  db import queries as qs
+from  utils import queries as qs
 
 from forex_python.bitcoin import BtcConverter
 
@@ -26,30 +26,6 @@ st.title("Yahoo Finance Data")
 # Creating conection to db
 new_con = qs.get_connection()
 new_cur = new_con.cursor()
-
-# just in case if overpopulate
-# new_cur.execute('DROP TABLE IF EXISTS user_;')
-
-# create new databse if not exsist
-new_cur.execute("""CREATE TABLE IF NOT EXISTS user_portfolio (
-                    id INTEGER,
-                    login TEXT 
-                    portoflio_id INTEGER,
-                    purchase_date NUMERIC,
-                    purchase_price NUMERIC
-                    );
-                    """)
-
-new_cur.execute("""CREATE TABLE IF NOT EXISTS price_history (
-                    id INTEGER, 
-                    ticker BLOB, 
-                    date NUMERIC,
-                    close NUMERIC,
-                    volume INTEGER 
-                    );
-                    """)
-
-
 
 df_portfolio = pd.read_sql_query(f"SELECT * FROM user_portfolio WHERE login = ?;", new_con, params=(st.session_state.role_,))
 

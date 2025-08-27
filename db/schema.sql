@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXSIST users (
+CREATE TABLE IF NOT EXISTS users (
     login_ TEXT NOT NULL, 
     password_, 
     seed INTEGER,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXSIST users (
     last_refresh DATE 
 );
 
-CREATE TABLE IF NOT EXSIST user_portfolio (
+CREATE TABLE IF NOT EXISTS user_portfolio (
     login_ TEXT NOT NULL,
     ticker TEXT NOT NULL,
     purchase_date DATE,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXSIST user_portfolio (
     FOREIGN KEY (login_) REFERENCES users(login_)
 );
 
-CREATE TABLE IF NOT EXSIST price_history (
+CREATE TABLE IF NOT EXISTS price_history (
     ticker TEXT,
     data_ DATE,
     close_price REAL,

@@ -1,7 +1,7 @@
 # Libraries
 import streamlit as st
 import utils.web_scrap as webscrap
-import navigation
+import utils.navigation as navigation
 
 # Security 
 if "role_" not in st.session_state:

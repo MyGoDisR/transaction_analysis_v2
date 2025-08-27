@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import utils.finance as finance
-import navigation
+import utils.navigation as navigation
 import os
 import calendar
 from datetime import date

@@ -34,11 +34,11 @@ def authenticated_menu():
         st.page_link(f"pages/monthly.py", label=translations["second_page"][st.session_state.lang])
 
         # Creating conection to db
-        new_con = sqlite3.connect("users_.db")
+        new_con = sqlite3.connect("db/users_.db")
         new_cur = new_con.cursor()
 
         # Checking userbase 
-        select_query = f"SELECT * FROM users WHERE login='{st.session_state.role_}';"
+        select_query = f"SELECT * FROM users WHERE login_='{st.session_state.role_}';"
         df_users = pd.read_sql_query(select_query, new_con)
 
         if df_users['flats'].iloc[0] == 1:

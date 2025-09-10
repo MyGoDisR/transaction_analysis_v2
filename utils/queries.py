@@ -15,7 +15,9 @@ def clear_table(table_name):
     cursor.execute('''
     DELETE FROM table_name 
     ''', (table_name))
-    return cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return
 
 ##################################################################################################### Regular Usage
 
@@ -34,6 +36,7 @@ def init_db():
     cursor.executescript(sql_script)  # executes multiple statements
     conn.commit()
     conn.close()
+    return
 
 # 2. Get user portfolio info
 def get_user_portfolio(conn, login_):
@@ -43,7 +46,9 @@ def get_user_portfolio(conn, login_):
     FROM user_portoflio
     WHERE login_ = ?
     ''', (login_))
-    return cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return
 
 # 3. Insert trade to user portfolio
 def insert_trade(conn, login_, ticker, purchase_date, quantity):
@@ -54,7 +59,9 @@ def insert_trade(conn, login_, ticker, purchase_date, quantity):
     ON CONFLICT(login_, ticker, purchase_date, quantity)
     DO UPDATE SET quantity = quantity + excluded.quantity 
     ''', (login_, ticker, purchase_date, quantity))
-    return cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return
 
 # 4. Get new retreieve data to db
 def insert_data_to_db(conn, ticker, date_, close_price):
@@ -63,7 +70,9 @@ def insert_data_to_db(conn, ticker, date_, close_price):
     INSERT INTO price_history (ticker, date_, close_price):
     VALUES (?,?,?)
     ''', (ticker, date_, close_price))
-    return cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return
 
 # 5. Insert data to user table - new user added:
 def new_user_to_db(user_choice):
@@ -84,4 +93,6 @@ def new_user_to_db(user_choice):
         INSERT INTO users (login_, password_, seed, trading, flats, land, house) 
         VALUES (?,?,?,?,?,?,?);
         ''', (login_details))
-    return cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return

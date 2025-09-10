@@ -93,7 +93,7 @@ else:
         [translations["beauty_e"][st.session_state.lang], df[(df['Tags'] != 'Inflows') & (df['Tags'] == 'Beauty')]['Amount'].sum()],
         [translations["other_e"][st.session_state.lang], df[(df['Tags'] != 'Inflows') & (df['Tags'] == 'Others')]['Amount'].sum()]
     ]
-    # There will be a KPI's which gives the rough indicator
+    # KPI's
     row1 = st.columns(3)
     row2 = st.columns(3)
 

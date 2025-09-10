@@ -22,11 +22,28 @@ def encode_hash_pass(password):
 #### New user creation ##################################################################################################################################################
 
 def creat_new_user(user_choice):
-    if st.session_state['pass_'] != st.session_state['re_pass_']:
-        st.error('Password is not the same in both field')
+    if 'lang' not in st.session_state:
+        st.session_state.lang = "ENG"
+
+    translations = {
+    "error_pass1": {"ENG": "Password should have at least 8 characters", "POL": "Hasło powinno posiadać co najmiej 8 znaków"},
+    "error_pass2": {"ENG": "Password is not the same in both field", "POL": "Hasła nie są takie same"},
+    "error_login": {"ENG": "This login already exsist - try different name", "POL": "Taki login już istnieje - spróbuj inną nazwe"},
+    "error_pass3": {"ENG": "The password should contain at least one number and one special character", "POL": "Hasło powinno zawierać co najmniej jedną liczbe oraz jeden znak specjalny"},
+    "succ1": {"ENG": "New user succesfully created!", "POL":"Nowe konto zostało utworzone!"}
+    }
+
+    if st.session_state['login_'] in os.listdir('Data'):
+        st.error(translations["error_login"][st.session_state.lang])
         return False
-    elif st.session_state['login_'] in os.listdir('Data'):
-        st.error('This login already exsist try different name')
+    elif len(st.session_state['pass_']) <= 7:
+        st.error(translations["error_pass1"][st.session_state.lang])
+        return False
+    elif st.session_state['pass_'] != st.session_state['re_pass_']:
+        st.error(translations["error_pass2"][st.session_state.lang])
+        return False
+    elif any(not c.isalnum() for c in st.session_state['pass_']) == False or any(i.isdigit for i in st.session_state['pass_']) == False:
+        st.error(translations["error_pass3"][st.session_state.lang])
         return False
     else:
         qs.new_user_to_db(user_choice)

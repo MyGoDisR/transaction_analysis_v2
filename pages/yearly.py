@@ -116,11 +116,11 @@ else:
     dataframe_df['Date'] = dataframe_df['Date'].dt.date
 
     # Display the filtered data
-    st.write(f"### {translations["sel_trans"][st.session_state.lang]}")
+    st.write(translations["sel_trans"][st.session_state.lang])
     st.dataframe(dataframe_df[['Date','Desc','Tags','Amount']], use_container_width=True)
 
     # Line chart - Running balance
-    st.write(f"### {translations["title_1"][st.session_state.lang]}")
+    st.write(translations["title_1"][st.session_state.lang])
     df['Week'] = df['Date'].dt.isocalendar().week
     chart_data = df[df['Tags'].isin(categories)].groupby('Week')['Amount'].sum().reset_index()
 

@@ -1,10 +1,10 @@
 import streamlit as st
 from time import sleep
-import utils.navigation as navigation
-import utils.login_management as login_management
 import sqlite3
 import pandas as pd
-import certifi
+
+import utils.navigation as navigation
+import utils.login_management as login_management
 from utils import queries as qs
 
 # This is the structure of the app,
@@ -23,7 +23,7 @@ if "lang" not in st.session_state:
     st.session_state.lang = 'ENG'
 
 lang = ["ENG", "POL"]
-lang_selection = st.pills("", lang, selection_mode="single", width="stretch")
+lang_selection = st.pills("", lang, selection_mode="single")
 st.session_state.lang = 'ENG' if None == lang_selection else lang_selection
 
 translations = {
@@ -64,9 +64,6 @@ password = st.text_input(translations["pass"][st.session_state.lang], key='passw
 # Creating conection to db
 con = sqlite3.connect("db/users_.db")
 cursor = con.cursor()
-cursor.execute('''
-SELECT * FROM users
-''')
 
 # Checking userbase 
 select_query = "SELECT * FROM users;"
@@ -92,12 +89,11 @@ if st.button(translations["login"][st.session_state.lang], type="primary"):
 st.write('')
 st.write('')
 st.write(translations["new_prof"][st.session_state.lang])
+
 col1, col2 = st.columns([1,2])
 with col1:
-    if st.button(translations["yes_"][st.session_state
-.lang]):
+    if st.button(translations["yes_"][st.session_state.lang]):
         st.switch_page("pages/new_user.py")
 with col2:
-    if st.button(translations["no_"][st.session_state
-.lang]):
+    if st.button(translations["no_"][st.session_state.lang]):
         st.switch_page("pages/home.py")

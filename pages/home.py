@@ -21,7 +21,7 @@ translations = {
     "type_mess": {"ENG": "we do not support other file types then pdf and csv", "POL": "aplikacja nie wspiera pliki innego typu niż csv i pdf"}
     }
 
-st.title(f"{translations["title"][st.session_state.lang]} {st.session_state.role_}!")
+st.title(translations["title"][st.session_state.lang] + " " + st.session_state.role_ + " !")
 st.write(translations["put_data"][st.session_state.lang])
 st.write(translations["process_info"][st.session_state.lang])
 st.write(translations["naming_info"][st.session_state.lang])

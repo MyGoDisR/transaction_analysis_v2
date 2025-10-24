@@ -24,3 +24,15 @@ CREATE TABLE IF NOT EXISTS price_history (
     close_price REAL,
     PRIMARY KEY (symbol, data_)
 );
+
+CREATE TABLE IF NOT EXISTS bonds_hisotry (
+    login_ TEXT NOT NULL,
+    country TEXT NOT NULL,
+    purchase_date DATE,
+    quantity REAL,
+    interest_rate REAL,
+    purchase_price REAL,
+    coupon_after_tax REAL,
+    PRIMARY KEY (login_, purchase_date)
+    FOREIGN KEY (login_) REFERENCES users(login_)
+);

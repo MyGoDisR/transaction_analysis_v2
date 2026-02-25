@@ -49,14 +49,19 @@ def creat_new_user(user_choice):
         qs.new_user_to_db(user_choice)
         # Create folder for User data
         os.mkdir(f"Data/{st.session_state['login_']}")
-        # Create sub-folders Archived and Processed data
-        os.mkdir(f"Data/{st.session_state['login_']}/Loaded")
-        os.mkdir(f"Data/{st.session_state['login_']}/Processed")
+
+        # Create 2 subfolders
+        os.mkdir(f"Data/{st.session_state['login_']}/Transactions")
+        os.mkdir(f"Data/{st.session_state['login_']}/Trading")
+
+        # Create Transaction sub-folders Archived and Processed data
+        os.mkdir(f"Data/{st.session_state['login_']}/Transactions/Loaded")
+        os.mkdir(f"Data/{st.session_state['login_']}/Transactions/Processed")
+
+        # Create Trading sub-folders Archived and Processed data
+        os.mkdir(f"Data/{st.session_state['login_']}/Trading/Loaded")
+        os.mkdir(f"Data/{st.session_state['login_']}/Trading/Processed")
+
         # notify user about succesfull profile creation
         st.write('New user succesfully created!')
         return True
-
-#### Initialize db schema ###
-def init_db_from_file(conn, schema_path="db/schema.sql"):
-    with open(schema_path, 'r') as f:
-        conn.executescript(f.read())

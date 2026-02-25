@@ -1,5 +1,13 @@
-/Data/*
-/output.csv
-/restricted.py
-/.streamlit
-/utils/__pycache__
+# Ignore everything 
+*
+utils/__pycache__
+
+# Except
+!/Data/GeoJsons
+!db/*
+!pages/*
+!utils/*
+!app.py
+!README.md
+!.gitignore
+!.streamlit/*

@@ -54,25 +54,19 @@ if "clicked" not in st.session_state:
 def onSearch(opt):
     st.session_state["clicked"] = True
 
-qs.init_db()
-
 st.title(translations["title"][st.session_state.lang])
 
 username = st.text_input(translations["logs"][st.session_state.lang], key='login_')
 password = st.text_input(translations["pass"][st.session_state.lang], key='password', type="password")
 
 # Creating conection to db
-con = sqlite3.connect("db/users_.db")
-cursor = con.cursor()
+qs.init_db()
 
-# Checking userbase 
-select_query = "SELECT * FROM users;"
-df_users = pd.read_sql_query(select_query, con)
+df_users = qs.get_user_details()
 
 if st.button(translations["login"][st.session_state.lang], type="primary"):
     if username in df_users['login_'].tolist():
         if login_management.hash_password(password)[1] == df_users[df_users['login_']==f'{username}']['password_'].iloc[0]:
-            cursor.close()
             st.session_state.logged_in = True
             st.session_state.role_ = st.session_state['login_']
             key = "_role"

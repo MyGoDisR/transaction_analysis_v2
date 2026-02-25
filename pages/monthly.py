@@ -8,10 +8,9 @@ import utils.navigation as navigation
 import os
 import calendar
 from datetime import date
-from forex_python.converter import CurrencyRates
-#c = CurrencyRates()
-#PLN_USD = c.get_rate('PLN', 'USD')
-#PLN_EUR = c.get_rate('PLN', 'EUR')
+import utils.fx_rates as fx_rates
+
+fx_rates_ = fx_rates.get_last_available_price()
 
 # Security 
 if "role_" not in st.session_state:
@@ -43,10 +42,10 @@ translations = {
     "no_data_mes": {"ENG":"Please choose specific month", "POL":"Wybierz miesiąc aby zobaczyć analizę"}
 }
 
-if len(os.listdir(f'Data/{st.session_state.role_}/Processed')) == 0:
+if len(os.listdir(f'Data/{st.session_state.role_}/Transactions/Processed')) == 0:
     st.error('In order to see analysis please upload the data', width='stretch')
 else:
-    df = pd.read_csv(f'Data/{st.session_state.role_}/Processed/final_output.csv')
+    df = pd.read_csv(f'Data/{st.session_state.role_}/Transactions/Processed/final_output.csv')
 
     df['Date'] = pd.to_datetime(df['Date'])
     df["Day"] = df["Date"].dt.day
@@ -59,10 +58,10 @@ else:
     curr = ["PLN", "EUR", "USD"]
     curr_selection = st.pills(translations["sel_curr"][st.session_state.lang], curr, selection_mode="single", )
     if curr_selection =="EUR":
-      df['Amount'] = round(df['Amount'] * 0.23,2)
+      df['Amount'] = round(df['Amount'] * fx_rates_['PLN_EUR'][0],2)
       currency_icon = "€"
     elif curr_selection == "USD":
-      df['Amount'] = round(df['Amount'] * 0.27,2)
+      df['Amount'] = round(df['Amount'] * fx_rates_['PLN_USD'][0],2)
       currency_icon = "$"
     else:
       currency_icon = "zł"
@@ -147,8 +146,7 @@ else:
           # Table Header
           st.write(translations["title_1"][st.session_state.lang])
           ############## TABLE ##############################################################################################################################################
-          st.dataframe(df_filtered.reset_index(drop=True).iloc[:,[0,1,4,3]], use_container_width=True) 
-
+          st.dataframe(df_filtered.reset_index(drop=True).iloc[:,[0,1,4,3]], use_container_width=True)
           ############## Bar Chart ##########################################################################################################################################
           st.write(f'### {translations["title_2"][st.session_state.lang]}')
           df_bar_chart = df_filtered.groupby(['WeekNo', 'Tags'], as_index=False)['Amount'].sum()
@@ -209,8 +207,11 @@ else:
             try:
                 return round(float(cell.split('$')[1]),2)
             except:
-                return None
+                return 0.00
+            
+          
           st.write(f'### {translations["title_4"][st.session_state.lang]} {year}-{months2[latest_month] if selection_ is None else selection_}')
+
           if curr_selection =="EUR":
             heatmap_df = calendar_df.applymap(extract_amount)
             st.table(heatmap_df.style

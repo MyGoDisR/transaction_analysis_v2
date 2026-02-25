@@ -5,7 +5,6 @@ import pandas as pd
 import sqlite3
 from  utils import queries as qs
 from datetime import datetime as dt
-import utils.finance as finance
 from pandas.tseries.offsets import DateOffset
 import plotly.express as px
 
@@ -22,7 +21,7 @@ if 'data_crypto' not in st.session_state:
     st.session_state.data_crypto = data_crypto
 
 if 'data_bonds' not in st.session_state:
-    data_bonds = pd.DataFrame({'Country':[],'Purchase Date':[],'Quantity':[],'Interest Rate':[],'Purchase Price':[],'Length':[]})
+    data_bonds = pd.DataFrame({'Country':[],'Purchase Date':[],'Quantity':[],'Interest Rate':[],'Purchase Price':[],'Period':[]})
     st.session_state.data_bonds = data_bonds
 
 if 'data_deposit' not in st.session_state:
@@ -36,12 +35,12 @@ navigation.menu()
 
 translations = {
     "title": {"ENG": "Finance Data", "POL": "Dane Finansowe"},
-    "choose_file_": {"ENG": "If you have transaction detals in CSV or PDF please drop the file/s here", "POL": "Jezeli masz plik PDF albo CSV z transakcjami, proszę załącz plik/i tutaj"},
-    "type_mess": {"ENG": "we do not support other file types then pdf and csv", "POL": "aplikacja nie wspiera pliki innego typu niż csv i pdf"},
+    "choose_file_": {"ENG": "If you have transaction detals in Excel please drop the file/s here", "POL": "Jezeli masz plik Excel z transakcjami, proszę załącz plik/i tutaj"},
+    "type_mess": {"ENG": "we do not support other file types then csv or pdf", "POL": "aplikacja nie wspiera pliki innego typu niż xlsx"},
     "options": {"ENG": ['All Together','Bonds','Bank Deposit','Stocks','Crypto currencies'], "POL": ["Wszystko razem",'Obligacje','Lokata','Akcje','Krypto waluty']},
     "button1": {"ENG":"Submit", "POL":"Dodaj"},
     "data_":{'ENG':'Purch. Date (Y-m-d)', "POL":'Data Zakupu (Y-m-d)'},
-    "volume_":{'ENG':'Volume', "POL":"Ilość"},
+    "volume_":{'ENG':'Amount', "POL":"Ilość"},
     "interest_rate_":{'ENG':'Interest rate','POL':'Stopy procentowe'},
     "purchase_price":{'ENG':'Purchase price', "POL":"Cena zakupu"},
     "length":{'ENG':'Type (in years)','POL':'Rodzja (w latach)'},
@@ -49,24 +48,11 @@ translations = {
     "error_mess1":{'ENG':'Please provide correct Ticker', "POL":"Podaj poprawny Ticker"},
     "error_mess2":{'ENG':'Please provide correct date format dd/mm/yyyy', "POL":"Podaj poprawny format daty dd/mm/yyyy"},
     "error_mess3":{'ENG':'Please provide volume', "POL":"Podaj ilość"},
-    "error_mess4":{'ENG':'Please provide purchase price. If you do not know the price please leave it blank', "POL":"Podaj wartość zakupu. Jak nie znasz zostaw puste"}
+    "error_mess4":{'ENG':'Please provide purchase price. If you do not know the price please leave it blank', "POL":"Podaj wartość zakupu. Jak nie znasz zostaw puste"},
+    "genetal_error_message":{'ENG':'Something is wrong please restart the app','POL':'Ogólny błąd, proszę zrestartować aplikacje'}
     }
 
 st.title(translations["title"][st.session_state.lang])
-
-uploaded_files = st.file_uploader(
-    translations["choose_file_"][st.session_state.lang], accept_multiple_files=True
-)
-for uploaded_file in uploaded_files:
-    suffix = uploaded_file.name.split('.')[-1]
-    if suffix == 'csv':
-        finance.streamlit_uploaded_file(uploaded_file)
-        finance.csv_user_load()
-    elif suffix == 'pdf':
-        finance.streamlit_uploaded_file(uploaded_file)
-        finance.data_to_df()
-    else:
-        st.write(translations["type_mess"][st.session_state.lang])
 
 def add_dfForm_stocks():
     row = pd.DataFrame({'Ticker':[str.upper(st.session_state.ticker_stocks)],
@@ -74,7 +60,7 @@ def add_dfForm_stocks():
                 'Quantity':[st.session_state.quant_stocks],
                 "Purchase Price":[st.session_state.p_price_stocks]})
         
-    st.session_state.data_stocks = pd.concat([st.session_state.data_bonds, row])
+    st.session_state.data_stocks = pd.concat([st.session_state.data_stocks, row])
 
 def add_dfForm_crypto():
     row = pd.DataFrame({'Ticker':[str.upper(st.session_state.ticker_crypto)],
@@ -94,6 +80,8 @@ def add_dfForm_deposit():
         })
     
     st.session_state.data_deposit = pd.concat([st.session_state.data_deposit, row])
+    st.session_state.data_deposit['Amount'] = st.session_state.data_deposit.groupby(['Bank','Purchase Date','Interest Rate','Period'])['Amount'].transform('sum')
+    st.session_state.data_deposit.drop_duplicates(keep='first', inplace=True)
     st.session_state.data_deposit.reset_index(drop=True, inplace=True)
 
 def add_dfForm_bonds(i):
@@ -110,18 +98,18 @@ def add_dfForm_bonds(i):
     
     st.session_state.data_bonds = pd.concat([st.session_state.data_bonds, row])
     st.session_state.data_bonds['Coupon_after_tax'] = st.session_state.data_bonds['Quantity'] * st.session_state.data_bonds['Purchase Price'] * st.session_state.data_bonds['Interest Rate'] * 0.81
-    st.session_state.data_bonds['Quantity'] = st.session_state.data_bonds.groupby(['Country','Purchase Date','Interest Rate'])['Quantity'].transform('sum')
+    st.session_state.data_bonds['Quantity'] = st.session_state.data_bonds.groupby(['Country','Purchase Date','Interest Rate','Period'])['Quantity'].transform('sum')
     st.session_state.data_bonds['Coupon_after_tax'] = st.session_state.data_bonds.groupby(['Country','Purchase Date','Interest Rate'])['Coupon_after_tax'].transform('sum')
     st.session_state.data_bonds.drop_duplicates(keep='first', inplace=True)
     
     
 #def save_to_db_bonds():   
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(translations["options"][st.session_state.lang])
+_all_, _bonds_, _deposit_, _stocks_, _crypto_ = st.tabs(translations["options"][st.session_state.lang])
 
-with tab1:
+with _all_:
     st.write('all together')
-with tab2:
+with _bonds_:
     with st.form("form_bonds"):
         st.write("Please provide bonds transaction details")
         trade = []
@@ -166,7 +154,9 @@ with tab2:
         submitted = st.form_submit_button("Submit", on_click=add_dfForm_bonds(i), key='form_bonds')
         st.dataframe(st.session_state.data_bonds, hide_index=True)
         if submitted:
-            if sum(i) + 1 == 15:
+            if sum(i) == 15:
+                pass
+            elif sum(i) + 1 == 15:
                 st.error(translations["error_mess1"][st.session_state.lang])
             elif sum(i) + 2 == 15:
                 st.error(translations["error_mess2"][st.session_state.lang])
@@ -176,9 +166,11 @@ with tab2:
                 st.error('Please provide interest rate')
             else:
                 st.error(translations["error_mess4"][st.session_state.lang])
+
+
     if len(st.session_state.data_bonds) > 0:
         st.write('implement pie-chart')
-with tab3:
+with _deposit_:
     
     with st.form("form_deposit"):
         st.write("Please provide bank deposit details")
@@ -222,8 +214,10 @@ with tab3:
         if len(st.session_state.data_deposit) > 0:
             st.dataframe(st.session_state.data_deposit, hide_index=True)
         if submitted:
-            
-            if sum(i) + 1 == 15:
+
+            if sum(i) == 15:
+                pass
+            elif sum(i) + 1 == 15:
                 st.error(translations["error_mess1"][st.session_state.lang])
             elif sum(i) + 2 == 15:
                 st.error(translations["error_mess2"][st.session_state.lang])
@@ -238,6 +232,8 @@ with tab3:
             button_columns = st.columns(2)
             with button_columns[0]:
                 submit_to_db = st.form_submit_button("Save to DB")
+                if submit_to_db:
+                    qs.post_user_deposit(st.session_state.role_, st.session_state.data_deposit)
             with button_columns[1]:
                 analysis_ = st.form_submit_button('Show analysis')
 
@@ -265,6 +261,7 @@ with tab3:
                 df_deposit = pd.concat([df_deposit, row])
 
             df_deposit_all = pd.concat([df_deposit_all, df_deposit])
+
         with combined:
             st.write('in progress')
             df_deposit_all_combined = df_deposit_all.copy()
@@ -284,7 +281,24 @@ with tab3:
             fig = px.pie(df_pie_chart, values='Amount', names=df_pie_chart.index)
             st.plotly_chart(fig, use_container_width=True)
 
-with tab4:
+    if len(qs.get_user_deposit(st.session_state.role_))>0:
+        st.write('There should be something')
+        st.dataframe(qs.get_user_deposit(st.session_state.role_))
+
+
+
+with _stocks_:
+    uploaded_files = st.file_uploader(
+    translations["choose_file_"][st.session_state.lang], accept_multiple_files=True, key='stocks')
+
+    for uploaded_file in uploaded_files:
+        suffix = uploaded_file.name.split('.')[-1]
+        if suffix == 'xlsx':
+            trading.streamlit_uploaded_file_trading(uploaded_file)
+        else:
+            st.write(translations["type_mess"][st.session_state.lang])
+
+
     with st.form("form_stocks"):
         st.write("Please provide stocks transaction details")
         trade = []
@@ -328,7 +342,22 @@ with tab4:
                 st.error(translations["error_mess3"][st.session_state.lang])
             else:
                 st.error(translations["error_mess4"][st.session_state.lang])
-with tab5:
+
+    
+    # show already exsisting stocks:            
+    
+
+with _crypto_:
+    uploaded_files = st.file_uploader(
+    translations["choose_file_"][st.session_state.lang], accept_multiple_files=True, key='crypto')
+
+    for uploaded_file in uploaded_files:
+        suffix = uploaded_file.name.split('.')[-1]
+        if suffix == 'xlsx':
+            trading.streamlit_uploaded_file_trading(uploaded_file)
+        else:
+            st.write(translations["type_mess"][st.session_state.lang])
+
     with st.form("form_crypto"):
         st.write("Please provide crypto transaction details")
         trade = []

@@ -12,10 +12,10 @@ import re
 #### PDF data to tabular form ###########################################################################################################################################
 
 def data_to_df():
-  folder_path = f'Data/{st.session_state.role_}'
-  path_to_user_loaded_files = f'Data/{st.session_state.role_}/Loaded'
-  archive_path = f'Data/{st.session_state.role_}/Archived'
-  processed_files = f'Data/{st.session_state.role_}/Processed'
+  folder_path = f'Data/{st.session_state.role_}/Transactions'
+  path_to_user_loaded_files = f'Data/{st.session_state.role_}/Transactions/Loaded'
+  archive_path = f'Data/{st.session_state.role_}/Transactions/Archived'
+  processed_files = f'Data/{st.session_state.role_}/Transactions/Processed'
 
   if "Archived" not in listdir(folder_path):
         os.makedirs(folder_path+"/Archived")
@@ -570,16 +570,16 @@ def fixing_type(your_df):
 #### Streamlit Uploaded Files ###########################################################################################################################################
 
 def streamlit_uploaded_file(uploaded_file):
-    with open(os.path.join(f"Data/{st.session_state.role_}/Loaded",uploaded_file.name),"wb") as f:
+    with open(os.path.join(f"Data/{st.session_state.role_}/Transactions/Loaded",uploaded_file.name),"wb") as f:
         f.write(uploaded_file.getbuffer())
     st.success("File Saved")
 
 #### Loading user csv files #############################################################################################################################################
 
 def csv_user_load():
-    path_to_user_loaded_files = f'Data/{st.session_state.role_}/Loaded'
-    archive_path = f'Data/{st.session_state.role_}/Archived'
-    processed_files = f'Data/{st.session_state.role_}/Processed'
+    path_to_user_loaded_files = f'Data/{st.session_state.role_}/Transactions/Loaded'
+    archive_path = f'Data/{st.session_state.role_}/Transactions/Archived'
+    processed_files = f'Data/{st.session_state.role_}/Transactions/Processed'
 
     if len(path_to_user_loaded_files) == 0 and 'final_output.csv' in processed_files:
       return
@@ -617,11 +617,11 @@ def csv_user_load():
 #### Loading user pdf files #############################################################################################################################################
 
 def pdf_user_load():
-    if len(os.listdir(f'Data/{st.session_state.role_}/Loaded')) == 0:
-       return pd.read_csv(f'Data/{st.session_state.role_}/Processed/final_output.csv')
-    path_to_user_loaded_files = f'Data/{st.session_state.role_}/Loaded'
-    archive_path = f'Data/{st.session_state.role_}/Archived'
-    processed_files = f'Data/{st.session_state.role_}/Processed'
+    if len(os.listdir(f'Data/{st.session_state.role_}/Transactions/Loaded')) == 0:
+       return pd.read_csv(f'Data/{st.session_state.role_}/Transactions/Processed/final_output.csv')
+    path_to_user_loaded_files = f'Data/{st.session_state.role_}/Transactions/Loaded'
+    archive_path = f'Data/{st.session_state.role_}/Transactions/Archived'
+    processed_files = f'Data/{st.session_state.role_}/Transactions/Processed'
 
     df_main = pd.DataFrame()
 

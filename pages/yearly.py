@@ -6,12 +6,11 @@ import sys
 import os
 import utils.finance as finance
 import utils.navigation as navigation
+import utils.fx_rates as fx_rates
 import requests
-from forex_python.converter import CurrencyRates
-from forex_python.bitcoin import BtcConverter
-c = CurrencyRates()
-#PLN_USD = c.get_rate('PLN', 'USD')
-#PLN_EUR = c.get_rate('PLN', 'EUR')
+
+# Getting Last Avialbale FX Rates
+fx_rates_ = fx_rates.get_last_available_price()
 
 # Security 
 if "role_" not in st.session_state:
@@ -49,10 +48,10 @@ translations = {
 
 ######## Data #############################################################################
 
-if len(os.listdir(f'Data/{st.session_state.role_}/Processed')) == 0:
+if len(os.listdir(f'Data/{st.session_state.role_}/Transactions/Processed')) == 0:
     st.error('In order to see analysis please upload the data', width='stretch')
 else:
-    df = pd.read_csv(f'Data/{st.session_state.role_}/Processed/final_output.csv')
+    df = pd.read_csv(f'Data/{st.session_state.role_}/Transactions/Processed/final_output.csv')
 
     df['Date'] = pd.to_datetime(df['Date'])
     df["Day"] = df["Date"].dt.day
@@ -69,10 +68,10 @@ else:
     curr_selection = st.pills(translations["sel_curr"][st.session_state.lang], curr, selection_mode="single" )
 
     if curr_selection =="EUR":
-        df['Amount'] = df['Amount'] * 0.23
+        df['Amount'] = df['Amount'] * fx_rates_['PLN_EUR'][0]
         currency_icon = "€"
     elif curr_selection == "USD":
-        df['Amount'] = df['Amount'] * 0.27
+        df['Amount'] = df['Amount'] * fx_rates_['PLN_USD'][0]
         currency_icon = "$"
     else:
         currency_icon = "zł"

@@ -18,7 +18,7 @@ translations = {
     "process_info": {"ENG": "Please bear in mind that as of now we are able to process ipko, mbank, santander and bnp pdf bank statements", "POL": "Algorytm jest w stanie przeprocesować IPKO, mBank, Santander, BNP Paribas"},
     "naming_info": {"ENG": "Please bear in mind that in order to see your data from excel please name your columns as follow 'Date', 'Amount', 'Run_balance','Desc','Trans. type'", "POL": "Jeżeli załączac swoje dane Excel prosze nazwij kolumny: 'Date', 'Amount', 'Run_balance','Desc','Trans. type'"},
     "choose_file_": {"ENG": "Choose a CSV or PDF file", "POL": "Wybierz pliki CSV albo PDF"},
-    "type_mess": {"ENG": "we do not support other file types then pdf and csv", "POL": "aplikacja nie wspiera pliki innego typu niż csv i pdf"}
+    "type_mess": {"ENG": "App does not support other file types then pdf and csv", "POL": "Aplikacja nie wspiera pliki innego typu niż csv i pdf"}
     }
 
 st.title(translations["title"][st.session_state.lang] + " " + st.session_state.role_ + " !")

@@ -3,6 +3,17 @@ from datetime import datetime
 from time import sleep
 import pandas as pd
 import sqlite3
+import abalin_nameday
+import requests
+from urllib3 import HTTPSConnectionPool
+
+try:
+    response = requests.get('https://nameday.abalin.net/api/V2/today/Warsaw', params={'data': 'pl'})
+    names_days_today = response.json()['data']['pl']
+except:
+    response = 'No'
+    names_days_today = 'No internet connection'
+#names_days_today ='None'
 
 def authenticated_menu():
     if 'lang' not in st.session_state:
@@ -14,13 +25,11 @@ def authenticated_menu():
     "profile": {"ENG": "Your Profile", "POL": "Twój Profil"},
     "first_page": {"ENG": "Financial Yearly", "POL": "Finanse Roczne"},
     "second_page": {"ENG": "Finance Monthly", "POL": "Finanse w ujęciu miesięcznym"},
-    "third_page": {"ENG": "Flat for rent", "POL": "Mieszkania - wynajem"},
+    "third_page": {"ENG": "Real estate", "POL": "Nieruchomości"},
     "fourth_page": {"ENG": "Trading", "POL": "Inwestowanie"},
-    "fifth_page": {"ENG": "House for sale", "POL": "Dom - kupno"},
-    "sixth_page": {"ENG": "Land for sale", "POL": "Działka - kupno"},
     "welcome": {"ENG": "Welcome,", "POL": "Witaj, "},
     "today": {"ENG": "Today is: ", "POL": "Dziś jest: "},
-    "refresh": {"ENG": "Last Refresh: ", "POL": "Ostatnie odświeżenie: "},
+    "name_days": {"ENG":"Today name days have:", "POL":"Dziś imieniny mają:"},
     "language": {"ENG": "Choose language", "POL": "Wybierz język"},
     "loggout": {"ENG": "Logg out", "POL": "Wyloguj się"},
     }
@@ -34,28 +43,25 @@ def authenticated_menu():
         st.page_link(f"pages/monthly.py", label=translations["second_page"][st.session_state.lang])
 
         # Creating conection to db
-        new_con = sqlite3.connect("db/users_.db")
-        new_cur = new_con.cursor()
+        conn = sqlite3.connect("db/users_.db")
 
         # Checking userbase 
         select_query = f"SELECT * FROM users WHERE login_='{st.session_state.role_}';"
-        df_users = pd.read_sql_query(select_query, new_con)
+        df_users = pd.read_sql_query(select_query, conn)
 
-        if df_users['flats'].iloc[0] == 1:
+        if df_users['real_estate'].iloc[0] == 1:
             
-            st.page_link(f"pages/flat_for_rent.py", label=translations["third_page"][st.session_state.lang])
+            st.page_link(f"pages/real_estates.py", label=translations["third_page"][st.session_state.lang])
         if df_users['trading'].iloc[0] == 1:
             st.page_link(f"pages/trading_v2.py", label=translations["fourth_page"][st.session_state.lang])
-        if df_users['house'].iloc[0] == 1:
-            st.page_link(f"pages/house.py", label=translations["fifth_page"][st.session_state.lang])
-        if df_users['land'].iloc[0] == 1:
-            st.page_link(f"pages/land.py", label=translations["sixth_page"][st.session_state.lang]) 
     
         st.divider()
         st.write(translations["welcome"][st.session_state.lang] + " " + st.session_state['role_'] + "!")
         st.write(translations["today"][st.session_state.lang] + "  " + datetime.today().strftime("%Y-%m-%d"))
-        st.write(translations["refresh"][st.session_state.lang] + " TBD")
+        st.write(translations["name_days"][st.session_state.lang])
+        st.write(names_days_today)
         st.divider()
+        
         def set_lang(lang_code):
             st.session_state.lang = lang_code
         st.button("English", on_click=set_lang, args=("ENG",))
@@ -65,7 +71,7 @@ def authenticated_menu():
         st.write("")
         st.page_link("app.py", label=translations["loggout"][st.session_state.lang])
 
-        new_cur.close()
+        conn.close()
         return st.session_state.lang
 
 def unauthenticated_menu():

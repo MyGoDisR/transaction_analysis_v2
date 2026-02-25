@@ -78,6 +78,7 @@ con = qs.get_connection('db/users_.db')
 cursor = con.cursor()
 
 df_portfolio = pd.read_sql_query(f"SELECT * FROM user_portfolio WHERE login = ?;", con, params=(st.session_state.role_,))
+con.close()
 
 if df_portfolio.empty:
     st.write(translations["info_mess1"][st.session_state.lang])

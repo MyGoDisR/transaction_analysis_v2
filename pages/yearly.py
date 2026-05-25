@@ -9,29 +9,28 @@ import utils.navigation as navigation
 import utils.fx_rates as fx_rates
 import requests
 
-# Getting Last Avialbale FX Rates
-fx_rates_ = fx_rates.get_last_available_price()
-
 # Security 
 if "role_" not in st.session_state:
     st.switch_page("app.py")
 
+# Language chosen
+if 'lang' not in st.session_state:
+    st.session_state.lang = "ENG"
 
-if "lang" not in st.session_state:
-    st.session_state.lang = 'ENG'
-    lang_number = 0
-if st.session_state.lang is None:
-    lang_number = 0
-elif st.session_state.lang == "ENG":
-    lang_number = 0
-elif st.session_state.lang == "PLN":
-    lang_number = 1
+# Navigation applied
+# As of now users have option what to see in the navigation panel
+# that is chosen at the registration form
 navigation.menu()
 
+# Getting Last Avialbale FX Rates or Download the new one form the internet
+# This should be after securit is checked not to make unnecessary API calls
+fx_rates_ = fx_rates.get_last_available_price()
+
+# Dictionary with translations for the app, in order to make it multilingual
 translations = {
     "title": {"ENG": "Budget Overview", "POL": "Ogólny zarys budżetu"},
     "filtered_title": {"ENG": "Filter your transactions and view insights.", "POL": "Filtruj swoje transakcje and zobacz wnioski"},
-    "sel_curr": {"ENG": "Currency", "POL": "Waluta"},
+    "sel_curr": {"ENG": "Please select currency", "POL": "Wybierz walutę"},
     "sel_year": {"ENG": "Choose Year:", "POL": "Wybierz rok:"},
     "expenses": {"ENG": "Overall Spending", "POL": "Ogólne wydatki"},
     "income": {"ENG": "Overall Inflows", "POL": "Ogólne wpłaty"},
@@ -47,7 +46,7 @@ translations = {
 }
 
 ######## Data #############################################################################
-
+# WHY?
 if len(os.listdir(f'Data/{st.session_state.role_}/Transactions/Processed')) == 0:
     st.error('In order to see analysis please upload the data', width='stretch')
 else:
@@ -65,7 +64,12 @@ else:
     st.write(translations["filtered_title"][st.session_state.lang])
 
     curr = ["PLN", "EUR", "USD"]
-    curr_selection = st.pills(translations["sel_curr"][st.session_state.lang], curr, selection_mode="single" )
+    #curr_selection = st.pills(translations["sel_curr"][st.session_state.lang], curr, selection_mode="single" )
+    curr_selection = st.selectbox(
+        translations["sel_curr"][st.session_state.lang],
+        (curr),
+    )
+
 
     if curr_selection =="EUR":
         df['Amount'] = df['Amount'] * fx_rates_['PLN_EUR'][0]
@@ -80,7 +84,8 @@ else:
     selection = st.pills(translations["sel_year"][st.session_state.lang], years, selection_mode="single")
 
     # Filter the DataFrame
-    if selection != None:  
+    if selection != None:
+        df_ly = df[df['Year'] == (selection-1)].reset_index(drop=True) 
         df = df[df['Year'] == selection].reset_index(drop=True)
 
     # KPI's
@@ -92,13 +97,29 @@ else:
         [translations["beauty_e"][st.session_state.lang], df[(df['Tags'] != 'Inflows') & (df['Tags'] == 'Beauty')]['Amount'].sum()],
         [translations["other_e"][st.session_state.lang], df[(df['Tags'] != 'Inflows') & (df['Tags'] == 'Others')]['Amount'].sum()]
     ]
+    try:
+        KPI_list_LY = [
+            round(df[df['Tags'] != 'Inflows']['Amount'].sum() - df_ly[df_ly['Tags'] != 'Inflows']['Amount'].sum()),
+            round(df_ly[df_ly['Tags'] == 'Inflows']['Amount'].sum() - df[df['Tags'] == 'Inflows']['Amount'].sum()),
+            round(df_ly[df_ly['Tags'] == 'Food']['Amount'].sum()),
+            round(df_ly[df_ly['Tags'] == 'House appliencies']['Amount'].sum()),
+            round(df_ly[df_ly['Tags'] == 'Beauty']['Amount'].sum()),
+            round(df_ly[df_ly['Tags'] == 'Others']['Amount'].sum())
+        ]
+    except:
+        KPI_list_LY = [0,0,0,0,0,0]
+
     # KPI's
     row1 = st.columns(3)
     row2 = st.columns(3)
 
     for index, col in enumerate(row1 + row2):
-        title = col.container(height=120)
-        title.metric(KPI_list[index][0], str(round(KPI_list[index][1],2)) + " " + currency_icon)
+        title = col.container(height=130)
+        title.metric(KPI_list[index][0], 
+                     str(round(KPI_list[index][1],2)) + " " + currency_icon, 
+                     KPI_list_LY[index], 
+                     delta_color="inverse",
+                     chart_data=df[df['Tags'] != 'Inflows']['Amount'], chart_type="bar")
 
     # Filters
     categories = st.multiselect(translations["sel_tags"][st.session_state.lang], options=df['Tags'].unique(), default=df['Tags'].unique())

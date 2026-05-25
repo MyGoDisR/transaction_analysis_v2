@@ -1,11 +1,31 @@
 import streamlit as st
+
+# Dates
+import calendar
 from datetime import datetime
+from datetime import date
+
+# Sleep for logout
 from time import sleep
+
+# Data wrangling
 import pandas as pd
+import numpy as np
 import sqlite3
+
+# name days
 import abalin_nameday
+
+# for web extraction
 import requests
 from urllib3 import HTTPSConnectionPool
+import os
+
+# utils
+import utils.finance as finance
+import utils.fx_rates as fx_rates
+
+#import altair as alt
 
 try:
     response = requests.get('https://nameday.abalin.net/api/V2/today/Warsaw', params={'data': 'pl'})
@@ -13,11 +33,10 @@ try:
 except:
     response = 'No'
     names_days_today = 'No internet connection'
-#names_days_today ='None'
 
 def authenticated_menu():
-    if 'lang' not in st.session_state:
-        st.session_state.lang = "ENG"
+    #if 'lang' not in st.session_state:
+    #    st.session_state.lang = "ENG"
 
     translations = {
     "sidebar": {"ENG": "Navigation Sidebar", "POL": "Panel Sterujący"},
@@ -64,6 +83,8 @@ def authenticated_menu():
         
         def set_lang(lang_code):
             st.session_state.lang = lang_code
+
+        
         st.button("English", on_click=set_lang, args=("ENG",))
         st.button("Polski", on_click=set_lang, args=("POL",))
         st.divider()

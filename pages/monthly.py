@@ -36,7 +36,7 @@ translations = {
     "other_e": {"ENG": "Other Expenses", "POL": "Wydatki - Inne"},
     "sel_tags": {"ENG":"Select tags:", "POL":"Wybierz rodzaj:"},
     "title_1": {"ENG": "Detailed table with transactions", "POL": "Szczegółowa tablea z transakcjami"},
-    "title_2": {"ENG": "'Weekly Spending", "POL": "Wydatki tygodniowe"},
+    "title_2": {"ENG": "Weekly Spending", "POL": "Wydatki tygodniowe"},
     "title_3": {"ENG": "Spending during week", "POL": "Wydatki w ciągu tygodnia"},
     "title_4": {"ENG": "Spending over entire month of", "POL": "Wydatki w ciągu całego miesiąca ->"},
     "no_data_mes": {"ENG":"Please choose specific month", "POL":"Wybierz miesiąc aby zobaczyć analizę"}

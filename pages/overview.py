@@ -8,7 +8,7 @@ import os
 import utils.finance as finance
 from datetime import datetime
 import matplotlib.pyplot as plt
-import utils.navigation as navigation
+import core.navigation as navigation
 
 # Security 
 if "role_" not in st.session_state:

@@ -258,7 +258,9 @@ def clean_fx_table():
     conn = sqlite3.connect(DB_PATH, timeout=30)
     select_query = f"SELECT * FROM FX_table"
     df_fx_rates_all = pd.read_sql_query(select_query, conn)
-    df_fx_rates_all = df_fx_rates_all.drop_duplicates()
+    df_fx_rates_all.reset_index(inplace=True)
+    df_fx_rates_all.drop_duplicates(subset=['Date'], keep='last', inplace=True)
+    df_fx_rates_all.index = df_fx_rates_all['Date']
 
     df_fx_rates_all.to_sql(name='FX_table', con=conn, if_exists='replace', index=False)
     conn.close()

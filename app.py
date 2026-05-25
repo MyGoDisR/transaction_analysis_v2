@@ -1,8 +1,8 @@
+
 import streamlit as st
 from time import sleep
 import sqlite3
 import pandas as pd
-
 import utils.navigation as navigation
 import utils.login_management as login_management
 from utils import queries as qs
@@ -22,10 +22,13 @@ from utils import queries as qs
 if "lang" not in st.session_state:
     st.session_state.lang = 'ENG'
 
+# Language selection pills
 lang = ["ENG", "POL"]
 lang_selection = st.pills("", lang, selection_mode="single")
+
 st.session_state.lang = 'ENG' if None == lang_selection else lang_selection
 
+# Dictionary with translations for the app, in order to make it multilingual
 translations = {
     "title": {"ENG": "Welcome to Finance app", "POL": "Witam w apliacji Analiza budżetu"},
     "logs": {"ENG": "Username", "POL": "Login"},
@@ -40,8 +43,8 @@ translations = {
 }
 
 # Initialize st.session_state.role to None
-if "role" not in st.session_state:
-    st.session_state.role = None
+if "role_" not in st.session_state:
+    st.session_state.role_ = None
 
 if st.session_state.get('creat_new_account'):
     st.session_state['name'] = 'new'

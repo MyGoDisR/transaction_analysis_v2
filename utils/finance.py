@@ -180,15 +180,16 @@ def data_to_df():
               else:
                 df_main = pd.concat([df_main, pd.DataFrame(one_item[:3] + one_item[4:]).T])
               last_point = end_point
-            elif 'OPŁATA ZA RACHUNEK/PAKIET' in a[last_point+1]:
-              end_point = i+2
-              df_main = pd.concat([df_main, pd.DataFrame(a[last_point:last_point+3] + ['0','0','0','0'] + [a[last_point+3]]).T])
-              one_item = a[last_point+4:end_point]
+            elif 'OPŁATA ZA RACHUNEK/PAKIET' in a[last_point+2] or 'OPŽATA ZA RACHUNEK/PAKIET' in a[last_point+2]:
+              print(index)
+              end_point = i
+              df_main = pd.concat([df_main, pd.DataFrame(a[last_point:last_point+5] + ['0','0','0','0']).T])
+              one_item = a[last_point+5:end_point]
               if len(one_item) <= 8:
                 df_main = pd.concat([df_main, pd.DataFrame(one_item).T])
               else:
                 df_main = pd.concat([df_main, pd.DataFrame(one_item[:3] + one_item[4:]).T])
-              last_point = end_point
+              last_point = end_point +2
             else:
               end_point = i+2
               one_item = a[last_point:end_point]
